@@ -115,6 +115,41 @@ jobs:
             pnpm-shared-stable-${{ matrix.os }}-${{ matrix.target }}
           lookup-only: true
 
+      - name: Setup Go
+        if: github.event.inputs[matrix.input] == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build mihomo Alpha from source
+        if: github.event.inputs[matrix.input] == 'true'
+        shell: bash
+        run: |
+          git clone --depth 1 --branch Alpha https://github.com/MetaCubeX/mihomo.git /tmp/mihomo-build
+          cd /tmp/mihomo-build
+          VERSION="alpha-$(git rev-parse --short HEAD)"
+          BUILDTIME="$(date -u)"
+          case "${{ matrix.target }}" in
+            x86_64-pc-windows-msvc)       export GOOS=windows GOARCH=amd64 GOAMD64=v2; EXT=.exe ;;
+            i686-pc-windows-msvc)          export GOOS=windows GOARCH=386; EXT=.exe ;;
+            aarch64-pc-windows-msvc)       export GOOS=windows GOARCH=arm64; EXT=.exe ;;
+            x86_64-apple-darwin)           export GOOS=darwin GOARCH=amd64 GOAMD64=v1; EXT= ;;
+            aarch64-apple-darwin)          export GOOS=darwin GOARCH=arm64; EXT= ;;
+            x86_64-unknown-linux-gnu)      export GOOS=linux GOARCH=amd64 GOAMD64=v2; EXT= ;;
+            i686-unknown-linux-gnu)        export GOOS=linux GOARCH=386; EXT= ;;
+            aarch64-unknown-linux-gnu)     export GOOS=linux GOARCH=arm64; EXT= ;;
+            armv7-unknown-linux-gnueabihf) export GOOS=linux GOARCH=arm GOARM=7; EXT= ;;
+            riscv64gc-unknown-linux-gnu)   export GOOS=linux GOARCH=riscv64; EXT= ;;
+            loongarch64-unknown-linux-gnu) export GOOS=linux GOARCH=loong64; EXT= ;;
+            *) echo "Unknown target: ${{ matrix.target }}"; exit 1 ;;
+          esac
+          mkdir -p "$GITHUB_WORKSPACE/src-tauri/sidecar"
+          CGO_ENABLED=0 go build -tags with_gvisor -trimpath \
+            -ldflags "-X 'github.com/metacubex/mihomo/constant.Version=${VERSION}' -X 'github.com/metacubex/mihomo/constant.BuildTime=${BUILDTIME}' -w -s -buildid=" \
+            -o "$GITHUB_WORKSPACE/src-tauri/sidecar/verge-mihomo-alpha-${{ matrix.target }}${EXT}"
+          chmod 755 "$GITHUB_WORKSPACE/src-tauri/sidecar/verge-mihomo-alpha-${{ matrix.target }}${EXT}" 2>/dev/null || true
+          echo "Built mihomo Alpha ${VERSION} for ${{ matrix.target }}"
+
       - name: Pnpm install and check
         if: github.event.inputs[matrix.input] == 'true'
         run: |
