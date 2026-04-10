@@ -30,7 +30,7 @@
   "identifier": "io.github.clash-verge-rev.clash-verge-rev",
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXkgMUE3QzExNTlGMDcyNEYwOQpSV1FKVDNMd1dSRjhHbkRaM2tyNFA2UmJRTUJBcVZhVHFtLzI2S0pzNmc5enFWTVRKMkJ0bk9GZAo=",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ4NEJFQ0JGQjZENEQ1RjEKUldUeDFkUzJ2K3hMMkVjUHpYaEFaUkxoWGdFdU5oeW9RV3ErMmxIaEdhTmRqdkVNcGRwMUZPdFcK",
       "endpoints": [],
       "windows": {
         "installMode": "passive"
